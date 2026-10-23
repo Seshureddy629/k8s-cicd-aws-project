@@ -40,11 +40,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and publish Docker image
-        uses: docker/build-push-action@v6
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
         with:
           context: .
-          push: ${{ github.event_name == 'push' }}
+          push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/k8s-cicd-aws-project:latest
-            ghcr.io/${{ github.repository_owner }}/k8s-cicd-aws-project:${{ github.sha }}
+            ghcr.io/seshureddy629/k8s-cicd-aws-project:latest
+            ghcr.io/seshureddy629/k8s-cicd-aws-project:${{ github.sha }}
