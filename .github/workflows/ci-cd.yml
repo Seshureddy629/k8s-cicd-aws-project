@@ -40,15 +40,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and publish Docker image
-        if: github.event_name == 'push'
-        uses: docker/build-push-action@v6
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/seshureddy629/k8s-cicd-aws-project:latest
+            ghcr.io/seshureddy629/k8s-cicd-aws-project:${{ github.sha }}
 
   deploy-to-kubernetes:
     runs-on: self-hosted
