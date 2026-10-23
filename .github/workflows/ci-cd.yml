@@ -40,15 +40,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Lowercase Repository Name
-        run: |
-          echo "LOWER_REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      - name: Build and publish Docker image
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/seshureddy629/k8s-cicd-aws-project:latest
-            ghcr.io/seshureddy629/k8s-cicd-aws-project:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+  deploy-to-kubernetes:
+    runs-on: self-hosted
+    needs: build-and-publish
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Verify Kubernetes cluster
+        run: kubectl get nodes
+
+      - name: Deploy the new image
+        run: |
+          kubectl set image deployment/java-app \
+            java-app=ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+      - name: Wait for deployment
+        run: kubectl rollout status deployment/java-app --timeout=180s
+
+      - name: Verify application pods
+        run: kubectl get pods
