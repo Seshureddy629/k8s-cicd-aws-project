@@ -61,7 +61,7 @@ jobs:
       - name: Deploy the new image
         run: |
           kubectl set image deployment/java-app \
-            java-app=ghcr.io/${{ github.repository }}:${{ github.sha }}
+            java-app=ghcr.io/seshureddy629/k8s-cicd-aws-project:${{ github.sha }}
 
       - name: Wait for deployment
         run: kubectl rollout status deployment/java-app --timeout=180s
